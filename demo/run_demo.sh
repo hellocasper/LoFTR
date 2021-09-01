@@ -22,7 +22,7 @@ model_ckpt=../weights/indoor_ds.ckpt
 
 echo "Running LoFTR demo.."
 eval "$(conda shell.bash hook)"
-conda activate loftr
+conda activate python3_loftr
 python demo_loftr.py --weight $model_ckpt --input $input
 # To save the input video and output match visualizations.
 # python demo_loftr.py --weight $model_ckpt --input $input --save_video --save_input

@@ -85,13 +85,13 @@ class CoarseMatching(nn.Module):
                 'mconf' (torch.Tensor): [M]}
             NOTE: M' != M during training.
         """
-        N, L, S, C = feat_c0.size(0), feat_c0.size(1), feat_c1.size(1), feat_c0.size(2)
-
+        N, L, S, C = feat_c0.size(0), feat_c0.size(1), feat_c1.size(1), feat_c0.size(2) # 1,4800,4800,256
+        
         # normalize
         feat_c0, feat_c1 = map(lambda feat: feat / feat.shape[-1]**.5, [feat_c0, feat_c1])
-
+        
         if self.match_type == 'dual_softmax':
-            sim_matrix = torch.einsum("nlc,nsc->nls", feat_c0, feat_c1) / self.temperature
+            sim_matrix = torch.einsum("nlc,nsc->nls", feat_c0, feat_c1) / self.temperature  #self.temperature=0.1
             if mask_c0 is not None:
                 valid_sim_mask = mask_c0[..., None] * mask_c1[:, None]
                 _inf = torch.zeros_like(sim_matrix)
@@ -142,11 +142,12 @@ class CoarseMatching(nn.Module):
         """
         axes_lengths = {'h0c': data['hw0_c'][0], 'w0c': data['hw0_c'][1],
                         'h1c': data['hw1_c'][0], 'w1c': data['hw1_c'][1]}
+        {'h0c': 60, 'w0c': 80, 'h1c': 60, 'w1c': 80}
         # 1. confidence thresholding
-        mask = conf_matrix > self.thr
+        mask = conf_matrix > self.thr #0.2
         mask = rearrange(mask, 'b (h0c w0c) (h1c w1c) -> b h0c w0c h1c w1c', **axes_lengths)
         if 'mask0' not in data:
-            mask_border(mask, self.border_rm, False)
+            mask_border(mask, self.border_rm, False) #2
         else:
             mask_border_with_padding(mask, self.border_rm, False, data['mask0'], data['mask1'])
         mask = rearrange(mask, 'b h0c w0c h1c w1c -> b (h0c w0c) (h1c w1c)', **axes_lengths)
@@ -158,11 +159,11 @@ class CoarseMatching(nn.Module):
 
         # 3. find all valid coarse matches
         # this only works when at most one `True` in each row
-        mask_v, all_j_ids = mask.max(dim=2)
+        mask_v, all_j_ids = mask.max(dim=2) 
         b_ids, i_ids = torch.where(mask_v)
         j_ids = all_j_ids[b_ids, i_ids]
         mconf = conf_matrix[b_ids, i_ids, j_ids]
-
+        
         # These matches select patches that feed into fine-level network
         coarse_matches = {'b_ids': b_ids, 'i_ids': i_ids, 'j_ids': j_ids}
 
@@ -172,7 +173,7 @@ class CoarseMatching(nn.Module):
         scale1 = scale * data['scale1'][b_ids] if 'scale1' in data else scale
         mkpts0_c = torch.stack([i_ids % data['hw0_c'][1], i_ids // data['hw0_c'][1]], dim=1) * scale0
         mkpts1_c = torch.stack([j_ids % data['hw1_c'][1], j_ids // data['hw1_c'][1]], dim=1) * scale1
-
+        
         # These matches is the current prediction (for visualization)
         coarse_matches.update({'gt_mask': mconf == 0,
                                'm_bids': b_ids[mconf != 0],  # mconf == 0 => gt matches

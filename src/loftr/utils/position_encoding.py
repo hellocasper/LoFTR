@@ -15,11 +15,11 @@ class PositionEncodingSine(nn.Module):
         """
         super().__init__()
 
-        pe = torch.zeros((d_model, *max_shape))
+        pe = torch.zeros((d_model, *max_shape)) # [C, H, W]
         y_position = torch.ones(max_shape).cumsum(0).float().unsqueeze(0)
         x_position = torch.ones(max_shape).cumsum(1).float().unsqueeze(0)
         div_term = torch.exp(torch.arange(0, d_model//2, 2).float() * (-math.log(10000.0) / d_model//2))
-        div_term = div_term[:, None, None]  # [C//4, 1, 1]
+        div_term = div_term[:, None, None]  # [C//4, 1, 1]    d_model//2 /2 = C//4
         pe[0::4, :, :] = torch.sin(x_position * div_term)
         pe[1::4, :, :] = torch.cos(x_position * div_term)
         pe[2::4, :, :] = torch.sin(y_position * div_term)

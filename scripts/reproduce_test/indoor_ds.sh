@@ -1,5 +1,9 @@
 #!/bin/bash -l
 
+export NCCL_DEBUG=info
+export NCCL_SOCKET_IFNAME=eth0
+export NCCL_IB_DISABLE=1
+
 SCRIPTPATH=$(dirname $(readlink -f "$0"))
 PROJECT_DIR="${SCRIPTPATH}/../../"
 
