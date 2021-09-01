@@ -8,7 +8,7 @@ export PYTHONPATH=$PROJECT_DIR:$PYTHONPATH
 cd $PROJECT_DIR
 
 data_cfg_path="configs/data/scannet_test_1500.py"
-main_cfg_path="configs/loftr/loftr_ot.py"
+main_cfg_path="configs/loftr/indoor/buggy_pos_enc/loftr_ot.py"
 ckpt_path="weights/indoor_ot.ckpt"
 dump_dir="dump/loftr_ot_indoor"
 profiler_name="inference"
@@ -26,4 +26,3 @@ python -u ./test.py \
     --batch_size=${batch_size} --num_workers=${torch_num_workers}\
     --profiler_name=${profiler_name} \
     --benchmark 
-    

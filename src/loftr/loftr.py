@@ -17,7 +17,9 @@ class LoFTR(nn.Module):
 
         # Modules
         self.backbone = build_backbone(config)
-        self.pos_encoding = PositionEncodingSine(config['coarse']['d_model']) #256
+        self.pos_encoding = PositionEncodingSine(
+            config['coarse']['d_model'], 
+            temp_bug_fix=config['coarse']['temp_bug_fix']) #256
         self.loftr_coarse = LocalFeatureTransformer(config['coarse']) #CN()..
         self.coarse_matching = CoarseMatching(config['match_coarse']) #CN()..
         self.fine_preprocess = FinePreprocess(config)
@@ -71,3 +73,9 @@ class LoFTR(nn.Module):
         
         # 5. match fine-level
         self.fine_matching(feat_f0_unfold, feat_f1_unfold, data)
+
+    def load_state_dict(self, state_dict, *args, **kwargs):
+        for k in list(state_dict.keys()):
+            if k.startswith('matcher.'):
+                state_dict[k.replace('matcher.', '', 1)] = state_dict.pop(k)
+        return super().load_state_dict(state_dict, *args, **kwargs)

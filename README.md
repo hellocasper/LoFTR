@@ -12,14 +12,14 @@
 - [x] Inference code and pretrained models (DS and OT) (2021-4-7)
 - [x] Code for reproducing the test-set results (2021-4-7)
 - [x] Webcam demo to reproduce the result shown in the GIF above (2021-4-13)
-- [ ] Training code and training data preparation (expected 2021-6-10)
+- [x] Training code and training data preparation (expected 2021-6-10)
 
 The entire codebase for data pre-processing, training and validation is under major refactoring and will be released around June.
 Please subscribe to [this discussion thread](https://github.com/zju3dv/LoFTR/discussions/2) if you wish to be notified of the code release.
 In the meanwhile, discussions about the paper are welcomed in the [discussion panel](https://github.com/zju3dv/LoFTR/discussions).
 
 ## Colab demo
-Want to run LoFTR with your own image pair without writing any code? Try the Colab demo:
+Want to run LoFTR with custom image pairs without configuring your own GPU environment? Try the Colab demo:
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BgNIOjFHauFoNB95LGesHBIjioX74USW?usp=sharing)
 
 ## Installation
@@ -127,6 +127,13 @@ cd demo
 </details>
 
 ### Reproduce the testing results with pytorch-lightning
+You need to setup the testing subsets of ScanNet and MegaDepth first. We create symlinks from the previously downloaded datasets to `data/{{dataset}}/test`.
+
+```shell
+# set up symlinks
+ln -s /path/to/scannet-1500-testset/* /path/to/LoFTR/data/scannet/test
+ln -s /path/to/megadepth-1500-testset/* /path/to/LoFTR/data/megadepth/test
+```
 
 ```shell
 conda activate loftr
@@ -142,7 +149,7 @@ For visualizing the results, please refer to `notebooks/visualize_dump_results.i
 <br/>
 
 
-### Image pair info for training on ScanNet
+<!-- ### Image pair info for training on ScanNet
 You can download the data at [here](https://drive.google.com/file/d/1fC2BezUSsSQy7_H65A0ZfrYK0RB3TXXj/view?usp=sharing).
 
 <details>
@@ -175,7 +182,11 @@ Out[19]: 1684276
 `data['name']` is the image pair info, organized as [`scene_id`, `seq_id`, `image0_id`, `image1_id`].
 
 `data['score']` is the overlapping score defined in [SuperGlue](https://arxiv.org/pdf/1911.11763) (Page 12).
-</details>
+</details> -->
+
+
+## Training
+See [Training LoFTR](./docs/TRAINING.md) for more details.
 
 ## Citation
 
